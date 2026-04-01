@@ -10,6 +10,10 @@ export const authMiddleware = async (req, res, next) => {
 
         const token = authHeader.split(' ')[1]; 
 
+        if (!supabase) {
+            throw new HttpException(500, "Supabase client not initialized. Check server logs for environment variable errors.");
+        }
+
         const { data: { user }, error } = await supabase.auth.getUser(token);
 
         if (error || !user) {
