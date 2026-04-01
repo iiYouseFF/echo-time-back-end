@@ -1,4 +1,4 @@
-import { HttpExepction } from "../../core/HttpExepction.js";
+import { HttpException } from "../../core/HttpException.js";
 
 export class UserService {
     constructor(userRepository) {
@@ -8,7 +8,7 @@ export class UserService {
     async getUserProfile(userId) {
         const user = await this.userRepository.findById(userId);
         if (!user) {
-            throw new HttpExepction(404, 'User Not Found');
+            throw new HttpException(404, 'User Not Found');
         }
         return user;
     }
@@ -16,14 +16,14 @@ export class UserService {
     async checkTimeBalance(userId, requiredHourse) {
         const user = await this.getUserProfile(userId);
         if(user.time_balance < requiredHourse) {
-            throw new HttpExepction(400, 'Insufficient time balance to create this task');
+            throw new HttpException(400, 'Insufficient time balance to create this task');
         }
         return true;
     }
 
     async completeOnboarding(userId, surveyData) {
         if (!surveyData.interests || surveyData.interests.length === 0) {
-            throw new HttpExepction(400, "Please select at least one interest");
+            throw new HttpException(400, "Please select at least one interest");
         }
 
         const updatedProfile = await this.userRepository.update(userId, {
@@ -41,7 +41,7 @@ export class UserService {
             password,
         });
 
-        if (authError) throw new HttpExepction(400, authError.message);
+        if (authError) throw new HttpException(400, authError.message);
 
         const profile = await this.userRepository.createProfile({
             id: authData.user.id,
@@ -60,7 +60,7 @@ export class UserService {
             password
         });
 
-        if (error) throw new HttpExepction(401, "Invalid email or password");
+        if (error) throw new HttpException(401, "Invalid email or password");
 
         const profile = await this.userRepository.findById(data.user.id);
 

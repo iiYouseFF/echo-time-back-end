@@ -1,6 +1,6 @@
 import express from 'express';
 import { UserController } from './user.controller.js';
-import { UserService, UserService } from './user.service.js';
+import { UserService } from './user.service.js';
 import { UserRepository } from './user.repository.js';
 import { authMiddleware } from '../../middlewares/auth.middleware.js';
 

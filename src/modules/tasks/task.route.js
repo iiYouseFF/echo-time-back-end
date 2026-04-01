@@ -13,11 +13,11 @@ export class TaskRoutes {
         this.router = express.Router();
         this.path = '/tasks'
 
-        const userRepository = new UserRepository;
-        const userService = new UserService;
-        const taskRepository = new TaskRepository;
-        const taskService = new TaskService;
-        const taskController = new TaskController;
+        const userRepository = new UserRepository();
+        const userService = new UserService(userRepository);
+        const taskRepository = new TaskRepository();
+        const taskService = new TaskService(taskRepository, userService);
+        const taskController = new TaskController(taskService);
 
         this.initializeRoutes(taskController);
     }

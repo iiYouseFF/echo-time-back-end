@@ -1,22 +1,22 @@
-import { HttpExepction } from "../../core/HttpExepction.js";
+import { HttpException } from "../../core/HttpException.js";
 import { TaskController } from "../tasks/task.controller.js";
 
 export class ReviewService {
-    constructor (reviewRepository, taksRepository) {
+    constructor (reviewRepository, taskRepository) {
         this.reviewRepository = reviewRepository;
-        this.taksRepository = taksRepository;
+        this.taskRepository = taskRepository;
     }
 
-    async addReview(taksId, reviewerId, rating, comment) {
-        const task = await this.taksRepository.findById(taskId);
+    async addReview(taskId, reviewerId, rating, comment) {
+        const task = await this.taskRepository.findById(taskId);
         if (!task || task.status !== 'completed') {
-            throw new HttpExepction(400, 'You can only review completed tasks');
+            throw new HttpException(400, 'You can only review completed tasks');
         }
 
         const revieweeId = (reviewerId === task.creator_id) ? task.assigned_to : task.creator_id;
 
         if (reviewerId === revieweeId) {
-            throw new HttpExepction(400, 'You Cannot Review Yourself');
+            throw new HttpException(400, 'You Cannot Review Yourself');
         }
 
         return await this.reviewRepository.creatReview({

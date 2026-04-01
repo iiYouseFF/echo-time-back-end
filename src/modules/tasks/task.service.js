@@ -1,4 +1,4 @@
-import { HttpExepction } from "../../core/HttpExepction";
+import { HttpException } from "../../core/HttpException.js";
 
 export class TaskService {
     constructor(taskRepository, userService) {
@@ -11,7 +11,7 @@ export class TaskService {
         
         await this.userService.checkTimeBalance(userId, estimated_hours);
 
-        const newTask = await this.taskRepository.creat({
+        const newTask = await this.taskRepository.create({
             creator_id: userId,
             title,
             description,

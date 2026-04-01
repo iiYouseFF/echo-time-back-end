@@ -1,4 +1,4 @@
-import { HttpExepction } from "../../core/HttpExepction.js";
+import { HttpException } from "../../core/HttpException.js";
 
 export class TimeService{
     constructor(timeRepository, taskRepository){
@@ -8,21 +8,21 @@ export class TimeService{
 
     async completeTaskExchange(taskId, currentUserId){
         const task = await this.timeRepository.findById(taskId);
-        if (!task) throw new HttpExepction(404, "Task Not Found");
+        if (!task) throw new HttpException(404, "Task Not Found");
 
         if (task.creator_id !== currentUserId) {
-            throw new HttpExepction(403, 'Only the task creator can confirm completion');
+            throw new HttpException(403, 'Only the task creator can confirm completion');
         }
 
         if (!task.assigned_to) {
-            throw new HttpExepction(400, 'Cannot complete a task that has no assigned worker');
+            throw new HttpException(400, 'Cannot complete a task that has no assigned worker');
         }
 
         if (task.status === 'completed') {
-            throw new HttpExepction(400, 'Task is already completed');
+            throw new HttpException(400, 'Task is already completed');
         }
 
-        return await this.timeRepository.executeTimeTransfare(
+        return await this.timeRepository.executeTimeTransfer(
             taskId,
             task.assigned_to,
             task.estimated_hours

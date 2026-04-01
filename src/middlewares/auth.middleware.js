@@ -1,19 +1,19 @@
 import { supabase } from "../config/supabseClient.js";
-import { HttpExepction } from "../core/HttpExepction.js";
+import { HttpException } from "../core/HttpException.js";
 
 export const authMiddleware = async (req, res, next) => {
     try {
-        const auhtHeader = req.headers.authorization;
-        if(!auhtHeader || !auhtHeader.startWith('Bearer')){
-            throw new HttpExepction(401, 'Authentication token missing or invalid');
+        const authHeader = req.headers.authorization;
+        if(!authHeader || !authHeader.startsWith('Bearer')){
+            throw new HttpException(401, 'Authentication token missing or invalid');
         }
 
-        const token = auhtHeader.split(' ')[1]; 
+        const token = authHeader.split(' ')[1]; 
 
-        const { data: { user }, error } = await supabse.auth.getUser(token);
+        const { data: { user }, error } = await supabase.auth.getUser(token);
 
         if (error || !user) {
-            throw new HttpExepction(401, 'Invalid or expired session')
+            throw new HttpException(401, 'Invalid or expired session')
         }
 
         req.user = user;

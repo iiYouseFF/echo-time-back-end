@@ -1,9 +1,9 @@
-import { supabase } from "../config/supabseClient";
+import { supabase } from "../config/supabseClient.js";
 
 export class BaseRepository {
     constructor(table){
         this.table = table;
-        this.db =supabase;
+        this.db = supabase;
     }
 
     async findAll(){

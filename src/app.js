@@ -1,7 +1,7 @@
 import express from "express";
 import cors from 'cors';
 import helmet from "helmet";
-import { errormiddleware } from './middlewares/error.middleware.js';
+import { errorMiddleware } from './middlewares/error.middleware.js';
 
 class App {
     constructor(routes){
@@ -22,12 +22,12 @@ class App {
         }));
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: true}));
-        this.app.use(limiter);
+        // this.app.use(limiter);
     }
 
     initializeRoutes(routes){
         routes.forEach((route) => {
-            this.app.use('/apu', route.router);
+            this.app.use('/api', route.router);
         });
     }
 
