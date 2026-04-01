@@ -1,5 +1,4 @@
-import dotenv from 'dotenv';
-dotenv.config();
+import 'dotenv/config';
 import App from './app.js';
 import TaskRoutes from './modules/tasks/task.route.js'
 import UserRoutes from './modules/user/user.routes.js'
@@ -9,6 +8,8 @@ const app = new App([
     new UserRoutes()
 ]);
 
-app.listen();
+if (process.env.NODE_ENV !== 'production') {
+    app.listen();
+}
 
 export default app;
