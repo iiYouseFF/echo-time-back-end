@@ -1,4 +1,5 @@
 import { HttpException } from "../../core/HttpException.js";
+import { supabase } from "../../config/supabseClient.js";
 
 export class UserService {
     constructor(userRepository) {
