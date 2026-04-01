@@ -1,4 +1,5 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
+dotenv.config();
 import App from './app.js';
 import TaskRoutes from './modules/tasks/task.route.js'
 import UserRoutes from './modules/user/user.routes.js'
