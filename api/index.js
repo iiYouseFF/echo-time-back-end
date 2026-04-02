@@ -2,11 +2,15 @@ let app;
 
 try {
     // Dynamic import to catch any initialization errors
-    const dotenv = await import('dotenv/config');
-    const { default: App } = await import('../src/app.js');
-    const { default: TaskRoutes } = await import('../src/modules/tasks/task.route.js');
-    const { default: UserRoutes } = await import('../src/modules/user/user.routes.js');
+    await import('dotenv/config');
+    const appModule = await import('../src/app.js');
+    const taskModule = await import('../src/modules/tasks/task.route.js');
+    const userModule = await import('../src/modules/user/user.routes.js');
 
+    const App = appModule.App; 
+    const TaskRoutes = taskModule.default || taskModule.TaskRoutes;
+    const UserRoutes = userModule.default || userModule.UserRoutes;
+    
     console.info("All modules imported successfully");
 
     const appInstance = new App([
@@ -14,7 +18,7 @@ try {
         new UserRoutes()
     ]);
 
-    app = appInstance.app;
+    app = appInstance.expressApp;
 
     // Debug endpoint
     app.get('/api/debug', (req, res) => {
