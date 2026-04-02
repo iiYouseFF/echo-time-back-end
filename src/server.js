@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import App from './app.js';
+import { App } from './app.js';
 import TaskRoutes from './modules/tasks/task.route.js'
 import UserRoutes from './modules/user/user.routes.js'
 
@@ -12,4 +12,4 @@ if (process.env.NODE_ENV !== 'production') {
     app.listen();
 }
 
-export default app.app;
+export default app.expressApp;

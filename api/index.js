@@ -15,7 +15,7 @@ const initializeApp = () => {
             new UserRoutes()
         ]);
 
-        const app = appModule.app; 
+        const app = appModule.expressApp; 
 
         app.get('/api/health', (req, res) => {
             res.json({
