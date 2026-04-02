@@ -12,4 +12,4 @@ if (process.env.NODE_ENV !== 'production') {
     app.listen();
 }
 
-export default app;
+export default app.app;

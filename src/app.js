@@ -3,7 +3,7 @@ import cors from 'cors';
 import helmet from "helmet";
 import { errorMiddleware } from './middlewares/error.middleware.js';
 
-class App {
+export class App {
     constructor(routes){
         this.app = express();
         this.port = process.env.PORT || 5000;
@@ -42,4 +42,3 @@ class App {
     }
 }
 
-export default App;
