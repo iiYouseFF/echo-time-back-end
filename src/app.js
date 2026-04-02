@@ -26,6 +26,14 @@ export class App {
     }
 
     initializeRoutes(routes){
+        this.expressApp.get('/', (req, res) => {
+            res.status(200).json({
+                status: 'online',
+                timestamp: new Date().toISOString(),
+                node_env: process.env.NODE_ENV
+            });
+        });
+
         routes.forEach((route) => {
             this.expressApp.use('/api', route.router);
         });
