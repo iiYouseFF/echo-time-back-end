@@ -16,7 +16,7 @@ export class App {
     initializeMiddlewares() {
         this.expressApp.use(helmet());
         this.expressApp.use(cors({
-            origin: [process.env.CLIENT_URL, 'http://localhost:5173', /vercel\.app$/].filter(Boolean),
+            origin: [process.env.CLIENT_URL, 'http://localhost:5173', 'http://localhost:3000', /vercel\.app$/].filter(Boolean),
             methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
             allowedHeaders: ['Content-Type', 'Authorization']
         }));
