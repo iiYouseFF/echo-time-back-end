@@ -52,7 +52,7 @@ export class UserService {
             is_onboarded: false
         });
 
-        return { user: authData.user, profile};
+        return { user: { ...authData.user, ...profile } };
     }
 
     async login(email, password) {
@@ -67,7 +67,7 @@ export class UserService {
 
         return { 
             token: data.session.access_token, 
-            user: data.user, 
+            user: { ...data.user, ...profile }, 
             is_onboarded: profile.is_onboarded 
         };
     }
