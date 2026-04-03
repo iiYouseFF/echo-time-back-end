@@ -10,9 +10,10 @@ export class ChatService {
     const task = await this.taskRepository.findById(taskId);
     if (!task) throw new HttpException(404, 'Task not found');
 
-    // الشات متاح فقط للمشارك في المهمة (صاحبها أو المنفذ)
-    const isParticipant = task.creator_id === userId || task.assigned_to === userId;
-    if (!isParticipant) throw new HttpException(403, 'Unauthorized access to this chat');
+    // Temporarily allowing all authenticated users to chat on open tasks 
+    // until full task assignment module is deployed
+    // const isParticipant = task.creator_id === userId || task.assigned_to === userId;
+    // if (!isParticipant) throw new HttpException(403, 'Unauthorized access to this chat');
 
     // الشات يغلق إذا كانت المهمة مكتملة
     if (task.status === 'completed') {

@@ -5,6 +5,7 @@ import { App } from '../src/app.js';
 
 import TaskRoutes from '../src/modules/tasks/task.route.js';
 import UserRoutes from '../src/modules/user/user.routes.js';
+import ChatRoutes from '../src/modules/chat/chat.routes.js';
 
 let serverInstance;
 
@@ -12,7 +13,8 @@ const initializeApp = () => {
     try {
         const appModule = new App([
             new TaskRoutes(),
-            new UserRoutes()
+            new UserRoutes(),
+            new ChatRoutes()
         ]);
 
         const app = appModule.expressApp; 
