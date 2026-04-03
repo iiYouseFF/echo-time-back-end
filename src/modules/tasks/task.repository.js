@@ -8,7 +8,7 @@ export class TaskRepository extends BaseRepository{
     async findByStatus(status){
         const { data, error} = await this.db
         .from(this.table)
-        .select('*, profiles(full_name, avatar_url)')
+        .select('*, profiles!creator_id(full_name, avatar_url)')
         .eq('status', status);
         if(error) throw error;
         return data;
