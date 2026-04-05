@@ -58,6 +58,7 @@ io.on('connection', (socket) => {
             // Format for frontend
             const formattedMsg = {
                 id: savedMsg.id,
+                taskId: data.taskId,
                 senderId: savedMsg.sender_id,
                 text: savedMsg.content,
                 senderProfile: savedMsg.sender,
