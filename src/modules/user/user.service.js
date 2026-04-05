@@ -1,5 +1,5 @@
 import { HttpException } from "../../core/HttpException.js";
-import { supabase } from "../../config/supabseClient.js";
+import { supabase } from "../../config/supabaseClient.js";
 
 export class UserService {
     constructor(userRepository) {
@@ -11,7 +11,14 @@ export class UserService {
         if (!user) {
             throw new HttpException(404, 'User Not Found');
         }
-        return user;
+        
+        // Ensure default values for reputation data to prevent Frontend crashes
+        return {
+            ...user,
+            badges: user.badges || [],
+            ratingAvg: user.ratingAvg || 0,
+            freelanceUnlocked: user.freelanceUnlocked || false
+        };
     }
 
     async checkTimeBalance(userId, requiredHourse) {

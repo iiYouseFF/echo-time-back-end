@@ -1,4 +1,4 @@
-import { supabase } from "../config/supabseClient.js";
+import { supabase } from "../config/supabaseClient.js";
 
 export class BaseRepository {
     constructor(table){
