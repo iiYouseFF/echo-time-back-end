@@ -29,11 +29,12 @@ const io = new Server(server, {
             'https://echo-time-1.vercel.app',
             'http://localhost:5173',
             'http://localhost:3000'
-        ].filter(Boolean),
+        ].filter(Boolean).map(url => url.replace(/\/$/, "")), // Trim trailing slashes
         methods: ['GET', 'POST'],
-        credentials: true,
-        allowedHeaders: ['Content-Type', 'Authorization']
-    }
+        credentials: true
+    },
+    pingTimeout: 60000,
+    pingInterval: 25000
 });
 
 // 4. Initialize Services for Socket handling
@@ -77,9 +78,8 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 5000;
-const HOST = '0.0.0.0'; 
-server.listen(PORT, HOST, () => {
-    console.log(`Echo Time Server (with Sockets) running on http://${HOST}:${PORT}`);
+server.listen(PORT, () => {
+    console.log(`Echo Time Server (with Sockets) running on port ${PORT}`);
 });
 
 export default app.expressApp;
