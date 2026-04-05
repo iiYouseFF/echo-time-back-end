@@ -24,7 +24,7 @@ const server = http.createServer(app.expressApp);
 // 3. Initialize Socket.io
 const io = new Server(server, {
     cors: {
-        origin: [process.env.CLIENT_URL, 'http://localhost:5173', 'http://localhost:3000'].filter(Boolean),
+        origin: ['https://echo-time-1.vercel.app', 'http://localhost:5173', 'http://localhost:3000'].filter(Boolean),
         methods: ['GET', 'POST']
     }
 });
