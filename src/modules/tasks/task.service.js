@@ -43,10 +43,7 @@ export class TaskService {
         }
 
         // 4. تعيين المستخدم كمنفذ وتحديث الحالة
-        return await this.taskRepository.update(taskId, {
-            assigned_to: userId,
-            status: 'in_progress'
-        });
+        return await this.taskRepository.acceptTask(taskId, userId);
     }
 
     async completeTask(taskId, userId) {
