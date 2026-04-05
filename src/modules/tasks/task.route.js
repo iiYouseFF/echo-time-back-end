@@ -40,6 +40,13 @@ export class TaskRoutes {
             authMiddleware,
             controller.complete
         );
+
+        // قبول مهمة من السوق العام
+        this.router.patch(
+            `${this.path}/:taskId/accept`,
+            authMiddleware,
+            controller.accept
+        );
     }
 }
 

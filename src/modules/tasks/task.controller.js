@@ -46,4 +46,20 @@ export class TaskController {
             next(error);
         }
     };
+
+    accept = async (req, res, next) => {
+        try {
+            const { taskId } = req.params;
+            const userId = req.user.id;
+
+            const task = await this.taskService.acceptTask(taskId, userId);
+
+            res.status(200).json({
+                success: true,
+                data: task
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
 }
