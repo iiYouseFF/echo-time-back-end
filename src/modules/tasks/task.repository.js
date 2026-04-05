@@ -27,7 +27,7 @@ export class TaskRepository extends BaseRepository{
     async acceptTask(taskId, userId) {
         const { data, error } = await this.db
             .from(this.table)
-            .update({ assigned_to: userId, status: 'in_progress' })
+            .update({ assigned_to: userId })
             .eq('id', taskId)
             .eq('status', 'open')
             .select();
