@@ -24,8 +24,21 @@ const server = http.createServer(app.expressApp);
 // 3. Initialize Socket.io
 const io = new Server(server, {
     cors: {
-        origin: ['https://echo-time-1.vercel.app', 'http://localhost:5173', 'http://localhost:3000'].filter(Boolean),
-        methods: ['GET', 'POST']
+        origin: (origin, callback) => {
+            const whitelist = [
+                process.env.CLIENT_URL,
+                'https://echo-time-1.vercel.app',
+                'http://localhost:5173',
+                'http://localhost:3000'
+            ].filter(Boolean);
+            if (!origin || whitelist.includes(origin) || /vercel\.app$/.test(origin) || /railway\.app$/.test(origin)) {
+                callback(null, true);
+            } else {
+                callback(new Error('Not allowed by Socket CORS'));
+            }
+        },
+        methods: ['GET', 'POST'],
+        credentials: true
     }
 });
 
@@ -70,8 +83,9 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
-    console.log(`Echo Time Server (with Sockets) running on port ${PORT}`);
+const HOST = '0.0.0.0'; 
+server.listen(PORT, HOST, () => {
+    console.log(`Echo Time Server (with Sockets) running on http://${HOST}:${PORT}`);
 });
 
 export default app.expressApp;

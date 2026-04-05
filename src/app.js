@@ -8,6 +8,9 @@ export class App {
         this.expressApp = express();
         this.port = process.env.PORT || 5000;
 
+        // Trust Railway's load balancer
+        this.expressApp.set('trust proxy', 1);
+
         this.initializeMiddlewares();
         this.initializeRoutes(routes);
         this.initializeErrorHandling();
@@ -15,11 +18,29 @@ export class App {
 
     initializeMiddlewares() {
         this.expressApp.use(helmet());
-        this.expressApp.use(cors({
-            origin: [process.env.CLIENT_URL, 'http://localhost:5173', 'http://localhost:3000', /vercel\.app$/].filter(Boolean),
+        
+        const corsOptions = {
+            origin: (origin, callback) => {
+                const whitelist = [
+                    process.env.CLIENT_URL,
+                    'https://echo-time-1.vercel.app',
+                    'http://localhost:5173',
+                    'http://localhost:3000'
+                ].filter(Boolean);
+
+                // Allow if in whitelist or if it's a vercel/railway preview URL
+                if (!origin || whitelist.includes(origin) || /vercel\.app$/.test(origin) || /railway\.app$/.test(origin)) {
+                    callback(null, true);
+                } else {
+                    callback(new Error('Not allowed by CORS'));
+                }
+            },
             methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-            allowedHeaders: ['Content-Type', 'Authorization']
-        }));
+            allowedHeaders: ['Content-Type', 'Authorization'],
+            credentials: true
+        };
+
+        this.expressApp.use(cors(corsOptions));
         this.expressApp.use(express.json());
         this.expressApp.use(express.urlencoded({ extended: true}));
         // this.expressApp.use(limiter);
