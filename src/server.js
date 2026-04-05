@@ -72,6 +72,11 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('finish_task', (data) => {
+        io.to(data.taskId).emit('task_completed', data);
+        console.log(`Task ${data.taskId} marked as finished via socket`);
+    });
+
     socket.on('disconnect', () => {
         console.log('User Disconnected');
     });
