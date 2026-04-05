@@ -19,7 +19,7 @@ export class ReviewService {
             throw new HttpException(400, 'You Cannot Review Yourself');
         }
 
-        return await this.reviewRepository.creatReview({
+        return await this.reviewRepository.createReview({
             task_id: taskId,
             reviewer_id: reviewerId,
             reviewee_id: revieweeId,
