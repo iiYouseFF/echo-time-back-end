@@ -24,21 +24,15 @@ const server = http.createServer(app.expressApp);
 // 3. Initialize Socket.io
 const io = new Server(server, {
     cors: {
-        origin: (origin, callback) => {
-            const whitelist = [
-                process.env.CLIENT_URL,
-                'https://echo-time-1.vercel.app',
-                'http://localhost:5173',
-                'http://localhost:3000'
-            ].filter(Boolean);
-            if (!origin || whitelist.includes(origin) || /vercel\.app$/.test(origin) || /railway\.app$/.test(origin)) {
-                callback(null, true);
-            } else {
-                callback(new Error('Not allowed by Socket CORS'));
-            }
-        },
+        origin: [
+            process.env.CLIENT_URL,
+            'https://echo-time-1.vercel.app',
+            'http://localhost:5173',
+            'http://localhost:3000'
+        ].filter(Boolean),
         methods: ['GET', 'POST'],
-        credentials: true
+        credentials: true,
+        allowedHeaders: ['Content-Type', 'Authorization']
     }
 });
 

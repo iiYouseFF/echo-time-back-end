@@ -20,21 +20,12 @@ export class App {
         this.expressApp.use(helmet());
         
         const corsOptions = {
-            origin: (origin, callback) => {
-                const whitelist = [
-                    process.env.CLIENT_URL,
-                    'https://echo-time-1.vercel.app',
-                    'http://localhost:5173',
-                    'http://localhost:3000'
-                ].filter(Boolean);
-
-                // Allow if in whitelist or if it's a vercel/railway preview URL
-                if (!origin || whitelist.includes(origin) || /vercel\.app$/.test(origin) || /railway\.app$/.test(origin)) {
-                    callback(null, true);
-                } else {
-                    callback(new Error('Not allowed by CORS'));
-                }
-            },
+            origin: [
+                process.env.CLIENT_URL,
+                'https://echo-time-1.vercel.app',
+                'http://localhost:5173',
+                'http://localhost:3000'
+            ].filter(Boolean),
             methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
             allowedHeaders: ['Content-Type', 'Authorization'],
             credentials: true
