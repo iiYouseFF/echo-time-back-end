@@ -19,7 +19,11 @@ export default class ChatRoutes {
   }
 
   initializeRoutes(controller) {
+    // جلب كل المحادثات الخاصة بالمستخدم
+    this.router.get('/chat/conversations', authMiddleware, controller.getConversations);
+    // إرسال رسالة
     this.router.post('/chat/send', authMiddleware, controller.send);
+    // جلب تاريخ محادثة معينة
     this.router.get('/chat/history/:taskId', authMiddleware, controller.getHistory);
   }
 }

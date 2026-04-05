@@ -24,4 +24,15 @@ export class ChatController {
       next(error);
     }
   };
+
+  // جلب كل محادثات المستخدم الحالي
+  getConversations = async (req, res, next) => {
+    try {
+      const userId = req.user.id;
+      const conversations = await this.chatService.getConversations(userId);
+      res.status(200).json({ success: true, data: conversations });
+    } catch (error) {
+      next(error);
+    }
+  };
 }
