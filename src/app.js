@@ -25,7 +25,7 @@ export class App {
                 'https://echo-time-1.vercel.app',
                 'http://localhost:5173',
                 'http://localhost:3000'
-            ].filter(Boolean).map(url => url.replace(/\/$/, "")),
+            ],
             methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
             allowedHeaders: ['Content-Type', 'Authorization'],
             credentials: true
