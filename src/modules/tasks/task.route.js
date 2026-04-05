@@ -34,7 +34,14 @@ export class TaskRoutes {
             `${this.path}/open`,
             controller.getAllOpen
         );
+
+        this.router.patch(
+            `${this.path}/:taskId/complete`,
+            authMiddleware,
+            controller.complete
+        );
     }
 }
+
 
 export default TaskRoutes;

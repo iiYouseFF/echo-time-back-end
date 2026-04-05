@@ -19,7 +19,7 @@ export default class ChatRoutes {
   }
 
   initializeRoutes(controller) {
-    this.router.get(`${this.path}/:taskId`, authMiddleware, controller.getHistory);
-    this.router.post(`${this.path}/send`, authMiddleware, controller.send);
+    this.router.post('/chat/send', authMiddleware, controller.send);
+    this.router.get('/chat/history/:taskId', authMiddleware, controller.getHistory);
   }
 }

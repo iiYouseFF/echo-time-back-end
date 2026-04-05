@@ -26,4 +26,18 @@ export class TaskService {
     async getAvailableTasks() {
         return await this.taskRepository.findByStatus('open');
     }
-}
+
+    async completeTask(taskId, userId) {
+        // 1. التحقق من وجود المهمة
+        const task = await this.taskRepository.findById(taskId);
+        if (!task) throw new HttpException(404, "Task not found");
+
+        // 2. التحقق من أن المستخدم هو صاحب المهمة (Creator only can complete)
+        if (task.creator_id !== userId) {
+            throw new HttpException(403, "Only the task creator can mark it as completed.");
+        }
+
+        // 3. تحديث حالة المهمة
+        return await this.taskRepository.update(taskId, { status: 'completed' });
+    }
+}
