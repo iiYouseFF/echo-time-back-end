@@ -78,7 +78,7 @@ export class UserService {
 
         if (idCardData) {
             const { data: uploadData, error: uploadError } = await supabase.storage
-                .from('id_cards')
+                .from('national-ids')
                 .upload(`${authData.user.id}/id_card_${Date.now()}.png`, Buffer.from(idCardData, 'base64'), {
                     contentType: 'image/png'
                 });
