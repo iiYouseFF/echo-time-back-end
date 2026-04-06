@@ -62,4 +62,17 @@ export class TaskController {
             next(error);
         }
     };
+
+    getHistory = async (req, res, next) => {
+        try {
+            const userId = req.user.id;
+            const tasks = await this.taskService.getUserHistory(userId);
+            res.status(200).json({
+                success: true,
+                data: tasks
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
 }

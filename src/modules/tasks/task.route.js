@@ -47,6 +47,12 @@ export class TaskRoutes {
             authMiddleware,
             controller.accept
         );
+
+        this.router.get(
+            `${this.path}/history`,
+            authMiddleware,
+            controller.getHistory
+        );
     }
 }
 

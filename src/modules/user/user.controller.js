@@ -36,13 +36,26 @@ export class UserController{
 
     register = async (req, res, next) => {
         try {
-            const { email, password, fullName } = req.body;
-            const result = await this.userService.register(email, password, fullName);
+            const { email, password, fullName, username, avatarData, bio, skills, idCardData } = req.body;
+            const result = await this.userService.register(email, password, fullName, username, avatarData, bio, skills, idCardData);
             
             res.status(201).json({
             success: true,
             message: "User registered successfully. Please check your email for verification.",
             data: result
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    checkUsername = async (req, res, next) => {
+        try {
+            const { username } = req.query;
+            const exists = await this.userService.checkUsername(username);
+            res.status(200).json({
+                success: true,
+                data: { exists }
             });
         } catch (error) {
             next(error);

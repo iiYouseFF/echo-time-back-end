@@ -38,4 +38,15 @@ export class TaskRepository extends BaseRepository{
         }
         return data[0];
     }
+
+    async getUserHistory(userId) {
+        const { data, error } = await this.db
+            .from(this.table)
+            .select('*')
+            .or(`creator_id.eq.${userId},assigned_to.eq.${userId}`)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        return data;
+    }
 }

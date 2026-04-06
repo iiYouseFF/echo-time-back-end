@@ -34,6 +34,11 @@ export class UserRoutes {
             controller.register
         );
 
+        this.router.get(
+            `${this.path}/check-username`,
+            controller.checkUsername
+        );
+
         this.router.post(
             `${this.path}/login`,
             controller.login
