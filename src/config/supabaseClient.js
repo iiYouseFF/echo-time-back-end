@@ -4,13 +4,12 @@ import 'dotenv/config';
 class SupabaseProvider {
     constructor() {
         if (!SupabaseProvider.instance) {
-            const supabaseUrl = process.env.SUPABASE_URL;
-            const supabaseKey = process.env.SUPABASE_KEY;
+            const supabaseUrl = (process.env.SUPABASE_URL || '').trim().replace(/^['"]|['"]$/g, '');
+            const supabaseKey = (process.env.SUPABASE_ROLE_KEY || process.env.SUPABASE_KEY || '').trim().replace(/^['"]|['"]$/g, '');
 
-            if (!supabaseUrl || !supabaseKey) {
-                console.error("CRITICAL ERROR: SUPABASE_URL or SUPABASE_KEY is missing in environment variables.");
-                // Provide a dummy client or just log the error instead of crashing the whole process immediately
-                // This allows the function to start and developers to see the error in logs instead of a 500.
+            if (!supabaseUrl || !supabaseKey || !supabaseUrl.startsWith('http')) {
+                console.error("CRITICAL ERROR: SUPABASE_URL or SUPABASE_KEY is missing or invalid in environment variables.");
+                console.error("URL:", supabaseUrl);
                 this.client = null;
             } else {
                 this.client = createClient(supabaseUrl, supabaseKey);

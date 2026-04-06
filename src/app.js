@@ -3,10 +3,13 @@ import cors from 'cors';
 import helmet from "helmet";
 import { errorMiddleware } from './middlewares/error.middleware.js';
 
-class App {
+export class App {
     constructor(routes){
-        this.app = express();
+        this.expressApp = express();
         this.port = process.env.PORT || 5000;
+
+        // Trust Railway's load balancer
+        this.expressApp.set('trust proxy', 1);
 
         this.initializeMiddlewares();
         this.initializeRoutes(routes);
@@ -14,32 +17,48 @@ class App {
     }
 
     initializeMiddlewares() {
-        this.app.use(helmet());
-        this.app.use(cors({
-            origin: [process.env.CLIENT_URL, 'http://localhost:5173', /vercel\.app$/].filter(Boolean),
+        this.expressApp.use(helmet());
+        
+        const corsOptions = {
+            origin: [
+                process.env.CLIENT_URL,
+                'https://echo-time-1.vercel.app',
+                'http://localhost:5173',
+                'http://localhost:3000'
+            ],
             methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-            allowedHeaders: ['Content-Type', 'Authorization']
-        }));
-        this.app.use(express.json());
-        this.app.use(express.urlencoded({ extended: true}));
-        // this.app.use(limiter);
+            allowedHeaders: ['Content-Type', 'Authorization'],
+            credentials: true
+        };
+
+        this.expressApp.use(cors(corsOptions));
+        this.expressApp.use(express.json());
+        this.expressApp.use(express.urlencoded({ extended: true}));
+        // this.expressApp.use(limiter);
     }
 
     initializeRoutes(routes){
+        this.expressApp.get('/', (req, res) => {
+            res.status(200).json({
+                status: 'online',
+                timestamp: new Date().toISOString(),
+                node_env: process.env.NODE_ENV
+            });
+        });
+
         routes.forEach((route) => {
-            this.app.use('/api', route.router);
+            this.expressApp.use('/api', route.router);
         });
     }
 
     initializeErrorHandling() {
-        this.app.use(errorMiddleware);
+        this.expressApp.use(errorMiddleware);
     }
 
     listen(){
-        this.app.listen(this.port, () => {
+        this.expressApp.listen(this.port, () => {
             console.log(`Echo Time Server running on port ${this.port}`);
         });
     }
 }
 
-export default App;

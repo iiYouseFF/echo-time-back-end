@@ -34,7 +34,21 @@ export class TaskRoutes {
             `${this.path}/open`,
             controller.getAllOpen
         );
+
+        this.router.patch(
+            `${this.path}/:taskId/complete`,
+            authMiddleware,
+            controller.complete
+        );
+
+        // قبول مهمة من السوق العام
+        this.router.patch(
+            `${this.path}/:taskId/accept`,
+            authMiddleware,
+            controller.accept
+        );
     }
 }
+
 
 export default TaskRoutes;

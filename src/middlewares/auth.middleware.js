@@ -1,4 +1,4 @@
-import { supabase } from "../config/supabseClient.js";
+import { supabase } from "../config/supabaseClient.js";
 import { HttpException } from "../core/HttpException.js";
 
 export const authMiddleware = async (req, res, next) => {

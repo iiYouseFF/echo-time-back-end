@@ -8,7 +8,7 @@ export class TaskRepository extends BaseRepository{
     async findByStatus(status){
         const { data, error} = await this.db
         .from(this.table)
-        .select('*, profiles(full_name, avatar_url)')
+        .select('*, profiles!creator_id(full_name, avatar_url)')
         .eq('status', status);
         if(error) throw error;
         return data;
@@ -22,5 +22,20 @@ export class TaskRepository extends BaseRepository{
         .single();
         if(error) throw error;
         return data;
+    }
+
+    async acceptTask(taskId, userId) {
+        const { data, error } = await this.db
+            .from(this.table)
+            .update({ assigned_to: userId })
+            .eq('id', taskId)
+            .eq('status', 'open')
+            .select();
+
+        if (error) throw error;
+        if (!data || data.length === 0) {
+            throw new Error('Task could not be accepted. It may already be taken or you lack permission.');
+        }
+        return data[0];
     }
 }

@@ -1,50 +1,50 @@
-let app;
+// api/index.js
+import 'dotenv/config';
+import express from 'express';
+import { App } from '../src/app.js';
 
-try {
-    // Dynamic import to catch any initialization errors
-    const dotenv = await import('dotenv/config');
-    const { default: App } = await import('../src/app.js');
-    const { default: TaskRoutes } = await import('../src/modules/tasks/task.route.js');
-    const { default: UserRoutes } = await import('../src/modules/user/user.routes.js');
+import TaskRoutes from '../src/modules/tasks/task.route.js';
+import UserRoutes from '../src/modules/user/user.routes.js';
+import ChatRoutes from '../src/modules/chat/chat.routes.js';
 
-    console.info("All modules imported successfully");
+let serverInstance;
 
-    const appInstance = new App([
-        new TaskRoutes(),
-        new UserRoutes()
-    ]);
+const initializeApp = () => {
+    try {
+        const appModule = new App([
+            new TaskRoutes(),
+            new UserRoutes(),
+            new ChatRoutes()
+        ]);
 
-    app = appInstance.app;
+        const app = appModule.expressApp; 
 
-    // Debug endpoint
-    app.get('/api/debug', (req, res) => {
-        res.json({ 
-            status: 'ok', 
-            timestamp: new Date().toISOString(),
-            env: {
-                NODE_ENV: process.env.NODE_ENV,
-                HAS_SUPABASE_URL: !!process.env.SUPABASE_URL,
-                HAS_SUPABASE_KEY: !!process.env.SUPABASE_KEY
-            }
+        app.get('/api/health', (req, res) => {
+            res.json({
+                status: 'online',
+                platform: 'Vercel Serverless',
+                timestamp: new Date().toISOString(),
+                node_env: process.env.NODE_ENV
+            });
         });
-    });
 
-    console.info("App initialized successfully");
-} catch (error) {
-    // If initialization fails, create a minimal express app that shows the error
-    const express = (await import('express')).default;
-    app = express();
-    
-    const errorMessage = error.stack || error.message || String(error);
-    console.error("FATAL INITIALIZATION ERROR:", errorMessage);
-    
-    app.use((req, res) => {
-        res.status(500).json({
-            fatal: true,
-            message: "Server failed to initialize",
-            error: errorMessage
+        return app;
+    } catch (error) {
+        console.error('❌ Fatal Initialization Error:', error);
+        
+        const fallbackApp = express();
+        fallbackApp.use((req, res) => {
+            res.status(500).json({
+                error: 'Server failed to start',
+                details: process.env.NODE_ENV === 'development' ? error.message : 'Internal Server Error'
+            });
         });
-    });
+        return fallbackApp;
+    }
+};
+
+if (!serverInstance) {
+    serverInstance = initializeApp();
 }
 
-export default app;
+export default serverInstance;
