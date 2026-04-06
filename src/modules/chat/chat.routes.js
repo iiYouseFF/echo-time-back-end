@@ -25,5 +25,7 @@ export default class ChatRoutes {
     this.router.post('/chat/send', authMiddleware, controller.send);
     // جلب تاريخ محادثة معينة
     this.router.get('/chat/history/:taskId', authMiddleware, controller.getHistory);
+    // حذف المحادثة (مسح السجل)
+    this.router.delete('/chat/conversation/:taskId', authMiddleware, controller.deleteConversation);
   }
 }

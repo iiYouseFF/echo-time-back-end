@@ -35,4 +35,15 @@ export class ChatService {
   async getConversations(userId) {
     return await this.chatRepo.getConversations(userId);
   }
+
+  async deleteConversation(taskId, userId) {
+    const task = await this.taskRepo.findById(taskId);
+    if (!task) throw new HttpException(404, "Task not found");
+
+    if (task.creator_id !== userId && task.assigned_to !== userId) {
+        throw new HttpException(403, "Not authorized to delete this conversation");
+    }
+
+    return await this.chatRepo.deleteHistory(taskId);
+  }
 }

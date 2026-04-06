@@ -70,4 +70,14 @@ export class ChatRepository {
 
         return results.sort((a, b) => new Date(b.lastMessageTime || 0) - new Date(a.lastMessageTime || 0));
     }
+    
+    async deleteHistory(taskId) {
+        const { error } = await supabase
+            .from('messages')
+            .delete()
+            .eq('task_id', taskId);
+
+        if (error) throw error;
+        return true;
+    }
 }

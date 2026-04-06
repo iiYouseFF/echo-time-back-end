@@ -35,4 +35,15 @@ export class ChatController {
       next(error);
     }
   };
+
+  deleteConversation = async (req, res, next) => {
+    try {
+      const { taskId } = req.params;
+      const userId = req.user.id;
+      await this.chatService.deleteConversation(taskId, userId);
+      res.status(200).json({ success: true, message: "Conversation deleted successfully" });
+    } catch (error) {
+      next(error);
+    }
+  };
 }
