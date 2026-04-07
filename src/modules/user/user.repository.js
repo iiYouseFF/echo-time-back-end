@@ -104,4 +104,61 @@ export class UserRepository extends BaseRepository {
             tasks_count: tasksCount || 0
         };
     }
+
+    // --- Admin Methods ---
+
+    async getAllUsers() {
+        const { data, error } = await this.db
+            .from(this.table)
+            .select('*')
+            .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        return data;
+    }
+
+    async updateStatus(userId, statusData) {
+        const { data, error } = await this.db
+            .from(this.table)
+            .update(statusData)
+            .eq('id', userId)
+            .select()
+            .single();
+        
+        if (error) throw error;
+        return data;
+    }
+
+    async getSystemStats() {
+        // Total Users
+        const { count: userCount } = await this.db
+            .from(this.table)
+            .select('*', { count: 'exact', head: true });
+
+        // Total Tasks (Flow)
+        const { count: taskCount } = await this.db
+            .from('tasks')
+            .select('*', { count: 'exact', head: true });
+
+        // Total Completed Hours (Sum)
+        const { data: completedTasks } = await this.db
+            .from('tasks')
+            .select('hours')
+            .eq('status', 'completed');
+        
+        const totalHoursFlow = (completedTasks || []).reduce((acc, curr) => acc + (curr.hours || 0), 0);
+
+        // Pending Verifications
+        const { count: pendingVerifs } = await this.db
+            .from(this.table)
+            .select('*', { count: 'exact', head: true })
+            .eq('is_verified', false);
+
+        return {
+            totalUsers: userCount || 0,
+            totalTasks: taskCount || 0,
+            totalHours: totalHoursFlow,
+            pendingVerifs: pendingVerifs || 0
+        };
+    }
 }

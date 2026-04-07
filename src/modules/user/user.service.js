@@ -180,4 +180,27 @@ export class UserService {
         }
         return user;
     }
+
+    // --- Admin Services ---
+
+    async getAllUsers() {
+        return await this.userRepository.getAllUsers();
+    }
+
+    async updateStatus(userId, statusData) {
+        // Ensure only allowed fields are updated via this method
+        const allowedUpdates = ['is_verified', 'is_banned', 'role']; 
+        const filteredData = Object.keys(statusData)
+            .filter(key => allowedUpdates.includes(key))
+            .reduce((obj, key) => {
+                obj[key] = statusData[key];
+                return obj;
+            }, {});
+        
+        return await this.userRepository.updateStatus(userId, filteredData);
+    }
+
+    async getSystemStats() {
+        return await this.userRepository.getSystemStats();
+    }
 }

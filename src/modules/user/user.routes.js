@@ -61,6 +61,25 @@ export class UserRoutes {
             `${this.path}/login`,
             controller.login
         );
+
+        // --- Admin Routes ---
+        this.router.get(
+            `/admin/stats`,
+            authMiddleware,
+            controller.getAdminStats
+        );
+
+        this.router.get(
+            `/admin/users`,
+            authMiddleware,
+            controller.getAllUsers
+        );
+
+        this.router.patch(
+            `/admin/users/:userId/status`,
+            authMiddleware,
+            controller.updateUserStatus
+        );
     }
 }
 
