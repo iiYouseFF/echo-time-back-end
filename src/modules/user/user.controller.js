@@ -115,10 +115,6 @@ export class UserController{
 
     getAllUsers = async (req, res, next) => {
         try {
-            // Check if requester is admin
-            if (req.user.role !== 'admin') {
-                throw new HttpException(403, 'Forbidden: Admin access required');
-            }
             const users = await this.userService.getAllUsers();
             res.status(200).json({ success: true, data: users });
         } catch (error) {
@@ -128,9 +124,6 @@ export class UserController{
 
     updateUserStatus = async (req, res, next) => {
         try {
-            if (req.user.role !== 'admin') {
-                throw new HttpException(403, 'Forbidden: Admin access required');
-            }
             const { userId } = req.params;
             const statusData = req.body;
             const updatedUser = await this.userService.updateStatus(userId, statusData);
@@ -142,9 +135,6 @@ export class UserController{
 
     getAdminStats = async (req, res, next) => {
         try {
-            if (req.user.role !== 'admin') {
-                throw new HttpException(403, 'Forbidden: Admin access required');
-            }
             const stats = await this.userService.getSystemStats();
             res.status(200).json({ success: true, data: stats });
         } catch (error) {
