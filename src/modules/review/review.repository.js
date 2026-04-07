@@ -1,4 +1,4 @@
-import { supabase } from "../../config/supabseClient.js";
+import { supabase } from "../../config/supabaseClient.js";
 import { BaseRepository } from "../BaseRepository.js";
 
 export class ReviewRepository extends BaseRepository {
