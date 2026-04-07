@@ -31,5 +31,19 @@ export class ReviewController {
         } catch (error) {
             next(error);
         }
-  };
+    };
+
+    getUserReviews = async (req, res, next) => {
+        try {
+            const { userId } = req.params;
+            const reviews = await this.reviewService.getUserReviews(userId);
+
+            res.status(200).json({
+                success: true,
+                data: reviews
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
 }

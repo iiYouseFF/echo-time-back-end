@@ -28,4 +28,19 @@ export class ReviewRepository extends BaseRepository {
         const sum = data.reduce((acc, curr) => acc + curr.rating, 0);
         return (sum / data.length).toFixed(1);
     }
+
+    async getReviewsByReviewee(revieweeId) {
+        const { data, error } = await this.db
+            .from(this.table)
+            .select(`
+                *,
+                reviewer:profiles!reviewer_id(id, full_name, username, avatar_url),
+                task:tasks(id, title, category)
+            `)
+            .eq('reviewee_id', revieweeId)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        return data;
+    }
 }

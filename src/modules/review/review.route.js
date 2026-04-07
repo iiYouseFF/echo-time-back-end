@@ -31,6 +31,12 @@ export class ReviewRoutes {
             `${this.path}/reputation/:userId`,
             controller.getReputation
         );
+
+        // GET /reviews/user/:userId - الحصول على جميع تقييمات المستخدم
+        this.router.get(
+            `${this.path}/user/:userId`,
+            controller.getUserReviews
+        );
     }
 }
 

@@ -36,4 +36,8 @@ export class ReviewService {
             level: average >= 4.5 ? 'Expert' : 'Beginner'
         };
     }
+
+    async getUserReviews(userId) {
+        return await this.reviewRepository.getReviewsByReviewee(userId);
+    }
 }
