@@ -72,6 +72,27 @@ export class UserRoutes {
         );
 
         this.router.get(
+            `/admin/economy`,
+            authMiddleware,
+            roleMiddleware(['admin']),
+            controller.getEconomyData
+        );
+
+        this.router.get(
+            `/admin/disputes`,
+            authMiddleware,
+            roleMiddleware(['admin']),
+            controller.getDisputeData
+        );
+
+        this.router.get(
+            `/admin/analytics`,
+            authMiddleware,
+            roleMiddleware(['admin']),
+            controller.getAnalyticsData
+        );
+
+        this.router.get(
             `/admin/users`,
             authMiddleware,
             roleMiddleware(['admin']),

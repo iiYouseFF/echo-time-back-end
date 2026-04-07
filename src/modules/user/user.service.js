@@ -233,4 +233,29 @@ export class UserService {
     async getSystemStats() {
         return await this.userRepository.getSystemStats();
     }
+
+    async getEconomyDashboard() {
+        const transactions = await this.userRepository.getRecentTransactions();
+        const stats = await this.userRepository.getSystemStats();
+        return { 
+            transactions,
+            totalCirculation: stats.totalHours || 0,
+            avgTransaction: transactions.length > 0 ? (stats.totalHours / transactions.length).toFixed(1) : 0
+        };
+    }
+
+    async getDisputeDashboard() {
+        const flaggedReviews = await this.userRepository.getFlaggedReviews();
+        return { flaggedReviews };
+    }
+
+    async getAnalyticsDashboard() {
+        const categoryStats = await this.userRepository.getCategoryStats();
+        const stats = await this.userRepository.getSystemStats();
+        return { 
+            categoryStats,
+            totalPopulation: stats.totalUsers || 0,
+            growthFactor: (stats.totalUsers / 30).toFixed(2) // Mock growth factor
+        };
+    }
 }

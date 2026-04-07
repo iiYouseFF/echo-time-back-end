@@ -161,4 +161,46 @@ export class UserRepository extends BaseRepository {
             pendingVerifs: pendingVerifs || 0
         };
     }
+
+    // --- Advanced Admin Diagnostics ---
+
+    async getRecentTransactions() {
+        const { data, error } = await this.db
+            .from('tasks') // Assume completed tasks are the source of hour flow
+            .select('*, sender:profiles!creator_id(username, full_name), receiver:profiles!assigned_to(username, full_name)')
+            .eq('status', 'completed')
+            .order('updated_at', { ascending: false })
+            .limit(50);
+        
+        if (error) throw error;
+        return data;
+    }
+
+    async getCategoryStats() {
+        const { data, error } = await this.db
+            .from('tasks')
+            .select('category');
+        
+        if (error) throw error;
+
+        const stats = (data || []).reduce((acc, curr) => {
+            const cat = curr.category || 'Other';
+            acc[cat] = (acc[cat] || 0) + 1;
+            return acc;
+        }, {});
+
+        return Object.entries(stats).map(([name, count]) => ({ name, count }));
+    }
+
+    async getFlaggedReviews() {
+        // Fetch reviews with status issues or low ratings
+        const { data, error } = await this.db
+            .from('reviews')
+            .select('*, task:tasks(title, hours), reviewer:profiles!reviewer_id(username), reviewee:profiles!reviewee_id(username)')
+            .lt('rating', 3) // Flag reviews below 3 stars
+            .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        return data;
+    }
 }
