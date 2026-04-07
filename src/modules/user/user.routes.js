@@ -23,6 +23,24 @@ export class UserRoutes {
             controller.getMe
         );
 
+        this.router.patch(
+            `${this.path}/balance/add`,
+            authMiddleware,
+            controller.addBalance
+        );
+
+        this.router.get(
+            `${this.path}/streaks`,
+            authMiddleware,
+            controller.getStreaks
+        );
+
+        this.router.put(
+            `${this.path}/streaks`,
+            authMiddleware,
+            controller.updateStreaks
+        );
+
         this.router.post(
             `${this.path}/onboarding`,
             authMiddleware,

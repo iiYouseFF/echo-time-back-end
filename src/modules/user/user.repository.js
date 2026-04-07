@@ -37,6 +37,30 @@ export class UserRepository extends BaseRepository {
         return data;
     }
 
+    async getStreaks(userId) {
+        const { data, error } = await this.db.from(this.table).select('preferences').eq('id', userId).single();
+        if (error) throw error;
+        return data.preferences?.streaks || this._getDefaultStreaks();
+    }
+
+    async updateStreaks(userId, streaks) {
+        const { data: curData } = await this.db.from(this.table).select('preferences').eq('id', userId).single();
+        const prefs = curData?.preferences || {};
+        prefs.streaks = streaks;
+
+        const { data, error } = await this.db.from(this.table).update({ preferences: prefs }).eq('id', userId).select('preferences').single();
+        if (error) throw error;
+        return data.preferences.streaks;
+    }
+
+    _getDefaultStreaks() {
+        return {
+            learning: { count: 0, lastDate: null, freezesLeft: 1, totalEarned: 0, dailyActions: 0 },
+            helping: { count: 0, lastDate: null, freezesLeft: 1, totalEarned: 0, dailyActions: 0 },
+            contribution: { count: 0, lastDate: null, freezesLeft: 1, totalEarned: 0, dailyActions: 0 }
+        };
+    }
+
     async createProfile(profileData) {
         const { data, error } = await this.db
             .from(this.table)

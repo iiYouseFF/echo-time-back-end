@@ -45,8 +45,8 @@ export class App {
             crossOriginResourcePolicy: { policy: "cross-origin" }
         }));
         
-        this.expressApp.use(express.json());
-        this.expressApp.use(express.urlencoded({ extended: true}));
+        this.expressApp.use(express.json({ limit: '50mb' }));
+        this.expressApp.use(express.urlencoded({ limit: '50mb', extended: true }));
         // this.expressApp.use(limiter);
     }
 

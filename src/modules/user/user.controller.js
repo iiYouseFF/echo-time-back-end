@@ -17,6 +17,40 @@ export class UserController{
         }
     }
 
+    addBalance = async (req, res, next) => {
+        try {
+            const userId = req.user.id;
+            const { amount } = req.body;
+            const profile = await this.userService.addBalance(userId, amount);
+
+            res.status(200).json({
+                success: true,
+                message: "Balance updated successfully",
+                data: profile
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    getStreaks = async (req, res, next) => {
+        try {
+            const streaks = await this.userService.getStreaks(req.user.id);
+            res.status(200).json(streaks);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    updateStreaks = async (req, res, next) => {
+        try {
+            const streaks = await this.userService.updateStreaks(req.user.id, req.body);
+            res.status(200).json(streaks);
+        } catch (error) {
+            next(error);
+        }
+    }
+
     finishOnboarding = async (req, res, next) => {
         try {
             const userId = req.user.id;

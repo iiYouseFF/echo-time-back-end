@@ -1,5 +1,7 @@
 import { HttpException } from "../../core/HttpException.js";
 import { supabase } from "../../config/supabaseClient.js";
+import { decode } from 'base64-arraybuffer';
+import { createClient } from '@supabase/supabase-js';
 
 export class UserService {
     constructor(userRepository) {
@@ -31,6 +33,23 @@ export class UserService {
         return true;
     }
 
+    async addBalance(userId, amount) {
+        if (!amount || typeof amount !== 'number' || amount <= 0) {
+            throw new HttpException(400, 'Invalid amount');
+        }
+        const user = await this.getUserProfile(userId);
+        const newBalance = (user.time_balance || 0) + amount;
+        return await this.userRepository.updateBalance(userId, newBalance);
+    }
+
+    async getStreaks(userId) {
+        return await this.userRepository.getStreaks(userId);
+    }
+
+    async updateStreaks(userId, streaks) {
+        return await this.userRepository.updateStreaks(userId, streaks);
+    }
+
     async completeOnboarding(userId, surveyData) {
         if (!surveyData.interests || surveyData.interests.length === 0) {
             throw new HttpException(400, "Please select at least one interest");
@@ -46,44 +65,74 @@ export class UserService {
     }
 
     async register(email, password, fullName, username, avatarData, bio, skills, idCardData) {
-        // 1. Check if username is taken
-        const usernameExists = await this.userRepository.existsByUsername(username);
+        // 0. Normalize and Validate Username
+        const normalizedUsername = username.toLowerCase().trim().replace(/\s+/g, '');
+        
+        // Regex: 3-20 chars, lowercase letters, numbers, underscores, and dots only
+        const usernameRegex = /^[a-z0-9._]{3,20}$/;
+        if (!usernameRegex.test(normalizedUsername)) {
+            throw new HttpException(400, 'Username must be 3-20 characters long and contain only lowercase letters, numbers, underscores, or dots (no spaces).');
+        }
+
+        // 1. Check if username is taken (using normalized version)
+        const usernameExists = await this.userRepository.existsByUsername(normalizedUsername);
         if (usernameExists) {
             throw new HttpException(400, 'Username is already taken');
         }
 
         // 2. Auth Sign Up
-        const { data: authData, error: authError } = await supabase.auth.signUp({
+        const supabaseUrl = process.env.SUPABASE_URL || '';
+        const supabaseAnonKey = process.env.SUPABASE_KEY || '';
+        const authClient = createClient(supabaseUrl, supabaseAnonKey, { auth: { persistSession: false } });
+
+        const { data: authData, error: authError } = await authClient.auth.signUp({
             email,
             password,
         });
 
         if (authError) throw new HttpException(400, authError.message);
 
-        // 3. Handle File Uploads (Optimized for Base64 or Buffers)
+        // 3. Handle File Uploads (Optimized for Base64)
         let avatarUrl = null;
         let idCardUrl = null;
 
+        // Function to strip possible base64 headers
+        const cleanBase64 = (base64) => {
+            if (!base64) return null;
+            return base64.replace(/^data:image\/\w+;base64,/, "");
+        };
+
         if (avatarData) {
+            const cleaned = cleanBase64(avatarData);
             const { data: uploadData, error: uploadError } = await supabase.storage
                 .from('avatars')
-                .upload(`${authData.user.id}/avatar_${Date.now()}.png`, Buffer.from(avatarData, 'base64'), {
-                    contentType: 'image/png'
+                .upload(`${authData.user.id}/avatar_${Date.now()}.png`, decode(cleaned), {
+                    contentType: 'image/png',
+                    upsert: true
                 });
-            if (!uploadError) {
+            
+            if (uploadError) {
+                console.error('Avatar upload error:', uploadError);
+            } else {
                 const { data: publicUrlData } = supabase.storage.from('avatars').getPublicUrl(uploadData.path);
                 avatarUrl = publicUrlData.publicUrl;
             }
         }
 
         if (idCardData) {
+            const cleaned = cleanBase64(idCardData);
             const { data: uploadData, error: uploadError } = await supabase.storage
                 .from('national-ids')
-                .upload(`${authData.user.id}/id_card_${Date.now()}.png`, Buffer.from(idCardData, 'base64'), {
-                    contentType: 'image/png'
+                .upload(`${authData.user.id}/id_card_${Date.now()}.png`, decode(cleaned), {
+                    contentType: 'image/png',
+                    upsert: true
                 });
-            if (!uploadError) {
-                idCardUrl = uploadData.path; 
+            
+            if (uploadError) {
+                console.error('ID Card upload error:', uploadError);
+            } else {
+                const { data: publicUrlData } = supabase.storage.from('national-ids').getPublicUrl(uploadData.path);
+                idCardUrl = publicUrlData.publicUrl;
             }
         }
 
@@ -91,7 +140,7 @@ export class UserService {
         const profile = await this.userRepository.createProfile({
             id: authData.user.id,
             full_name: fullName,
-            username: username,
+            username: normalizedUsername,
             email: email,
             avatar_url: avatarUrl,
             bio: bio,
@@ -99,18 +148,24 @@ export class UserService {
             id_card_url: idCardUrl,
             is_verified: false,
             time_balance: 5,
-            is_onboarded: true // Since they did the multi-step signup
+            is_onboarded: true
         });
 
         return { user: { ...authData.user, ...profile } };
     }
 
     async checkUsername(username) {
-        return await this.userRepository.existsByUsername(username);
+        if (!username) return false;
+        const normalized = username.toLowerCase().trim().replace(/\s+/g, '');
+        return await this.userRepository.existsByUsername(normalized);
     }
 
     async login(email, password) {
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const supabaseUrl = process.env.SUPABASE_URL || '';
+        const supabaseAnonKey = process.env.SUPABASE_KEY || '';
+        const authClient = createClient(supabaseUrl, supabaseAnonKey, { auth: { persistSession: false } });
+
+        const { data, error } = await authClient.auth.signInWithPassword({
             email,
             password
         });
