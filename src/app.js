@@ -17,21 +17,34 @@ export class App {
     }
 
     initializeMiddlewares() {
-        this.expressApp.use(helmet());
-        
+        const origins = [
+            process.env.CLIENT_URL,
+            'https://echo-time-1.vercel.app',
+            'http://localhost:5173',
+            'http://localhost:3000'
+        ].filter(Boolean).map(url => url.replace(/\/$/, ""));
+
         const corsOptions = {
-            origin: [
-                process.env.CLIENT_URL,
-                'https://echo-time-1.vercel.app',
-                'http://localhost:5173',
-                'http://localhost:3000'
-            ],
+            origin: (origin, callback) => {
+                if (!origin || origins.indexOf(origin) !== -1) {
+                    callback(null, true);
+                } else {
+                    callback(new Error('Not allowed by CORS'));
+                }
+            },
             methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-            allowedHeaders: ['Content-Type', 'Authorization'],
-            credentials: true
+            allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+            credentials: true,
+            statusSuccessStatus: 200,
+            optionsSuccessStatus: 200
         };
 
         this.expressApp.use(cors(corsOptions));
+        
+        this.expressApp.use(helmet({
+            crossOriginResourcePolicy: { policy: "cross-origin" }
+        }));
+        
         this.expressApp.use(express.json());
         this.expressApp.use(express.urlencoded({ extended: true}));
         // this.expressApp.use(limiter);
