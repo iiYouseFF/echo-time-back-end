@@ -14,6 +14,21 @@ export class UserService {
             throw new HttpException(404, 'User Not Found');
         }
         
+        // Handle private signed URL for National ID if it exists
+        if (user.id_card_url) {
+            try {
+                const path = user.id_card_url.split('national-ids/')[1]?.split('?')[0];
+                if (path) {
+                    const { data: signedData } = await supabase.storage
+                        .from('national-ids')
+                        .createSignedUrl(path, 3600); // 1 hour expiry
+                    user.id_card_url = signedData?.signedUrl || user.id_card_url;
+                }
+            } catch (e) {
+                console.error("Error generating signed URL for user profile:", e);
+            }
+        }
+        
         // Ensure default values for reputation data 
         return {
             ...user,
@@ -143,6 +158,7 @@ export class UserService {
             skills: skills || [],
             id_card_url: idCardUrl,
             is_verified: false,
+            status: 'pending',
             time_balance: 5,
             is_onboarded: true
         });
@@ -184,12 +200,26 @@ export class UserService {
     // --- Admin Services ---
 
     async getAllUsers() {
-        return await this.userRepository.getAllUsers();
+        const users = await this.userRepository.getAllUsers();
+        
+        // Generate signed URLs for all users' National IDs for the admin
+        return await Promise.all(users.map(async (u) => {
+            if (u.id_card_url) {
+                const path = u.id_card_url.split('national-ids/')[1]?.split('?')[0];
+                if (path) {
+                    const { data } = await supabase.storage
+                        .from('national-ids')
+                        .createSignedUrl(path, 3600);
+                    u.id_card_url = data?.signedUrl || u.id_card_url;
+                }
+            }
+            return u;
+        }));
     }
 
     async updateStatus(userId, statusData) {
         // Ensure only allowed fields are updated via this method
-        const allowedUpdates = ['is_verified', 'is_banned', 'role']; 
+        const allowedUpdates = ['is_verified', 'is_banned', 'role', 'status']; 
         const filteredData = Object.keys(statusData)
             .filter(key => allowedUpdates.includes(key))
             .reduce((obj, key) => {
