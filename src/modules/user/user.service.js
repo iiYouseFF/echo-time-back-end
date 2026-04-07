@@ -81,11 +81,7 @@ export class UserService {
         }
 
         // 2. Auth Sign Up
-        const supabaseUrl = process.env.SUPABASE_URL || '';
-        const supabaseAnonKey = process.env.SUPABASE_KEY || '';
-        const authClient = createClient(supabaseUrl, supabaseAnonKey, { auth: { persistSession: false } });
-
-        const { data: authData, error: authError } = await authClient.auth.signUp({
+        const { data: authData, error: authError } = await supabase.auth.signUp({
             email,
             password,
         });
@@ -161,11 +157,7 @@ export class UserService {
     }
 
     async login(email, password) {
-        const supabaseUrl = process.env.SUPABASE_URL || '';
-        const supabaseAnonKey = process.env.SUPABASE_KEY || '';
-        const authClient = createClient(supabaseUrl, supabaseAnonKey, { auth: { persistSession: false } });
-
-        const { data, error } = await authClient.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
             email,
             password
         });
