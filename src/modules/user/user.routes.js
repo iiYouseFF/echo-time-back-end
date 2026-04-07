@@ -3,6 +3,7 @@ import { UserController } from './user.controller.js';
 import { UserService } from './user.service.js';
 import { UserRepository } from './user.repository.js';
 import { authMiddleware } from '../../middlewares/auth.middleware.js';
+import { roleMiddleware } from '../../middlewares/role.middleware.js';
 
 export class UserRoutes {
     constructor() {
@@ -66,18 +67,21 @@ export class UserRoutes {
         this.router.get(
             `/admin/stats`,
             authMiddleware,
+            roleMiddleware(['admin']),
             controller.getAdminStats
         );
 
         this.router.get(
             `/admin/users`,
             authMiddleware,
+            roleMiddleware(['admin']),
             controller.getAllUsers
         );
 
         this.router.patch(
             `/admin/users/:userId/status`,
             authMiddleware,
+            roleMiddleware(['admin']),
             controller.updateUserStatus
         );
     }
